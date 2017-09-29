@@ -1,0 +1,29 @@
+---
+########################################
+# handlers for role nginxwebserver     #
+########################################
+
+
+# handler to restart iptables
+- name: iptables-restart
+  service:
+    name=iptables
+    state=restarted
+    enabled=yes
+
+
+# handler to restart nginx
+- name: nginx-restart
+  service: 
+    name=nginx
+    state=restarted 
+    enabled=yes
+
+
+# handler to reload nginx
+- name: nginx-reload
+  service:
+    name=nginx
+    state=reloaded
+    enabled=yes
+

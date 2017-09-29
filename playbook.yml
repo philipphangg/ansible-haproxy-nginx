@@ -1,0 +1,23 @@
+---
+########################################
+# ansible playbook                     #
+########################################
+
+
+# install common software and repositories to all hosts
+- hosts: all
+  become: true
+  roles:
+  - common
+
+# install webserver-nginx to hosts test2 and test3
+- hosts: nginxwebserver
+  become: true
+  roles:
+  - nginxwebserver
+
+  # install loadbalancer haproxy to host test1
+- hosts: test1
+  become: true
+  roles:
+  - haproxy

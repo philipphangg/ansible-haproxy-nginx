@@ -1,0 +1,70 @@
+---
+########################################
+# install and configure nginx webserver#
+########################################
+
+
+# selinux allow nginx to listen on tcp port 8000/5500 and to set rlimit
+- name: selinux_http_port_t_8000_5500
+  seport:
+    ports: 8000, 5500
+    proto: tcp
+    setype: http_port_t
+    state: present
+
+- name: selinux allow nginx set rlimit
+  seboolean: 
+    name=httpd_setrlimit 
+    state=yes 
+    persistent=yes
+
+
+# configure iptables to allow incomming tcp connections on port 8000 and 5500
+- iptables_raw:
+    name: allow_tcp_8000_5500
+    rules: |
+      -A INPUT -p tcp -m tcp --dport 8000 -j ACCEPT
+      -A INPUT -p tcp -m tcp --dport 5500 -j ACCEPT      
+
+
+# install nginx (epel repository was added with role:common)
+- name: install nginx
+  yum: 
+    pkg=nginx 
+    state=installed
+  notify:
+    nginx-restart
+
+
+# remove nginx default configuration files
+- name: find default server configuration files
+  find:
+    paths: /etc/nginx/conf.d/
+  register: files_to_delete
+
+- name: delete default server configuration files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
+
+
+# run buildHtmlPages.sh
+- script: buildHtmlPages.sh
+
+
+# copy configuration to servers and restart nginx
+- name: copy nginx configuration to server
+  template: 
+    src=nginx.conf 
+    dest=/etc/nginx/conf.d/nginx.conf
+  notify: 
+    nginx-restart
+
+
+# ensure that nginx is started
+- name: (re)start nginx
+  service:
+    name=nginx
+    state=restarted
+    enabled=yes

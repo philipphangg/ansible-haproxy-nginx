@@ -1,0 +1,26 @@
+---
+########################################
+# handlers for role haproxy            #
+########################################
+
+
+# handler to restart iptables
+- name: iptables-restart
+  service:
+    name=iptables
+    state=restarted
+    enabled=yes
+
+# handler to restart haproxy
+- name: haproxy-restart
+  service: 
+    name=haproxy 
+    state=restarted
+    enabled=yes
+
+# handler to reload haproxy
+- name: haproxy-reload
+  service: 
+    name=haproxy 
+    state=reloaded
+    enabled=yes

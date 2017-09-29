@@ -1,0 +1,53 @@
+---
+########################################
+# install and configure haproxy        #
+########################################
+
+
+# selinux allow haproxy to listen on tcp port 80
+- name: selinux_http_port_t_80
+  seport:
+    ports: 80
+    proto: tcp
+    setype: http_port_t
+    state: present
+
+
+# configure iptables to allow incomming tcp connections on port 80
+- iptables_raw:
+    name: allow_tcp_80
+    rules: |
+      -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT      
+
+
+# install hproxy(epel repository was added with role:common)
+- name: install haproxy
+  yum: 
+    pkg=haproxy 
+    state=installed
+  notify:
+    haproxy-restart
+
+
+# remove haproxy default configuration file
+- name: delete default haproxy configuration file
+  file:
+    path: "/etc/haproxy/haproxy.cfg"
+    state: absent
+
+
+# copy configuration to server and restart haproxy
+- name: copy haproxy configuration to server
+  template: 
+    src=haproxy.cfg
+    dest=/etc/haproxy/haproxy.cfg
+  notify: 
+    haproxy-restart
+
+
+# ensure that haproxy is started
+- name: (re)start haproxy
+  service:
+    name=haproxy
+    state=restarted
+    enabled=yes

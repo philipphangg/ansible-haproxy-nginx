@@ -1,0 +1,17 @@
+########################################
+# ansible 'hosts' file                 #
+# ######################################
+
+ 
+# hostnames resolved by DNS
+ 
+
+# 1 host with haproxy
+[loadbalanceproxy]
+test1
+
+# 2 hosts with nginx webserver
+[nginxwebserver]
+test2
+test3
+

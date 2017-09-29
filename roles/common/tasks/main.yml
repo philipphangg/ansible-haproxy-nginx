@@ -1,0 +1,29 @@
+---
+########################################
+# install and configure                #
+# common basics to all servers         #
+########################################
+
+
+# add epel repository
+- name: add epel repository
+  yum_repository:
+    name: epel
+    description: epel yum repository
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+
+# upgrade all packages before configuring further software components
+- name: upgrade all packages
+  yum: 
+    name=* 
+    state=latest
+
+# common software components
+- name: installation of common software components
+  yum: 
+    pkg={{item}} 
+    state=installed
+  with_items:
+  - mc
+  - policycoreutils-python
+  - libselinux-python
